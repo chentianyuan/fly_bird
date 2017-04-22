@@ -23,6 +23,15 @@ $(function(){
 		gameBegin();
 	});
 	
+	$(".gameover h4").click(function(){
+		$('.gameover').hide();
+		$(".histroy").fadeIn();
+	});
+	
+	$(".histroy:last-child").click(function(){
+		$('.gameover').fadeIn();
+		$(".histroy").hide();
+	});
 });
 
 function gameBegin(){
@@ -34,6 +43,12 @@ function gameBegin(){
 	var timer = 0;
 	wrap.append("<div class='brid'></div>");
 	wrap.append("<h3 class='score'>0</h3>");
+	var history_score = [];
+	
+	//初始化分数	
+	for(var i = 0 ; i < 100 ; i++){
+		history_score[i] = 0;
+	}
 	
 		//首先监听键盘事件	
 		$(document).keydown(function(event){
@@ -74,7 +89,7 @@ function gameBegin(){
 	//生成游戏界面	
 		game_map = setInterval(function(){
 			if(!isgameOver(fly)){
-				generateBlock(timer,fly,game_map);
+				generateBlock(timer,fly,game_map,history_score);
 				//方块生成次数加一次只有成功生成后才算一次		
 				timer++;
 				//控制方块移动
@@ -88,12 +103,16 @@ function gameBegin(){
 }*/
 
 //生成障碍物
-function generateBlock(timer,fly,game_map){
+function generateBlock(timer,fly,game_map,history_score){
 	var m = Math.floor(Math.random()*10);
 	var a = [];
+	
+	
 	for(var i = 0 ; i < 100 ; i++){
 		a[i] = null;
 	}
+
+	
 		m = m % 5 + 2;//生成2-6的随机数
 		for(var i = 0 ; i < m ; i++){
 			$(".content").append("<div class='Block'></div>");
@@ -115,10 +134,19 @@ function generateBlock(timer,fly,game_map){
 				if(bird_top <= m * 55 || bird_top >= m*55+75 || bird_top >= 460){
 					clearInterval(fly);
 					clearInterval(game_map);
+					clearInterval(a[timer] + 1);
 					clearInterval(a[timer]);//碰撞后删除
 					$(".gameover").fadeIn();
 					var s = $(".score").text();
+ 					s = parseInt(s);
  					$(".gameover h3").text("您的得分为 "+ s +" 分");
+ 					for(var i = 0 ; i < 100 ; i++){
+ 						if(history_score[i] == 0 && s != 0 && !isNaN(s)){
+ 							history_score[i] = s;
+ 							$(".histroy ul").append("<li>"+ s +" 分</li>")
+ 							break;
+ 						}
+ 					}
 					$(".score").remove();
 				}
 			}
